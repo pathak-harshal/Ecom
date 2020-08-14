@@ -8,7 +8,9 @@ import 'package:Ecom/database/dao/product_dao.dart';
 import 'package:Ecom/database/dao/products_ranking_dao.dart';
 import 'package:Ecom/database/dao/ranking_dao.dart';
 import 'package:Ecom/database/dao/variant_dao.dart';
+import 'package:Ecom/database/entities/parent_category_entity.dart';
 import 'package:Ecom/database/processing_data.dart';
+import 'package:Ecom/ui/pages/category_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -117,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                           rankingDao,
                           productsRankingDao,
                         );
-                        return buildArticleList(state.resultModel.categories);
+                        return buildCategories();
                       } else if (state is EcomDataErrorState) {
                         return buildErrorUi(state.message);
                       }
@@ -150,48 +152,59 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildArticleList(List<Category> articles) {
-    parentCategoryDao.findAllParentCategoryList().then((list) {
-      print("No of Parent Categories ${list.length}");
-    });
-    categoryDao.findAllCategoryList().then((list) {
-      print("No of Categories ${list.length}");
-    });
-    productDao.findAllProductList().then((list) {
-      print("No of Products ${list.length}");
-    });
-    variantDao.findAllVariantList().then((list) {
-      print("No of Variants ${list.length}");
-    });
-    rankingDao.findAllRankingList().then((list) {
-      print("No of Ranking ${list.length}");
-    });
-    productsRankingDao.findAllProductRankingList().then((list) {
-      print("No of Product Ranking ${list.length}");
-    });
-    return ListView.builder(
-      itemCount: articles.length,
-      itemBuilder: (ctx, pos) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: InkWell(
-            child: ListTile(
-              leading: ClipOval(
-                child: Hero(
-                  tag: articles[pos].name,
-                  child: Image.network(
-                    articles[pos].id.toString(),
-                    fit: BoxFit.cover,
-                    height: 70.0,
-                    width: 70.0,
-                  ),
+  Widget buildCategories() {
+    return StreamBuilder<List<ParentCategoryEntity>>(
+      stream: parentCategoryDao.findAllParentCategories(),
+      builder: (_, AsyncSnapshot<List<ParentCategoryEntity>> snapshot) {
+        if (snapshot.hasData) {
+          final List<ParentCategoryEntity> categories = snapshot.data;
+          if (categories.length == 0) {
+            return const Center(
+              child: Text(
+                "Not Available",
+                style: TextStyle(
+                  fontSize: 20.0,
                 ),
               ),
-              title: Text(articles[pos].name),
+            );
+          } else {
+            return ListView.builder(
+              key: UniqueKey(),
+              shrinkWrap: true,
+              itemCount: categories.length,
+              itemBuilder: (_, index) {
+                final item = categories[index];
+                return ListTile(
+                  title: Text(item.parentCategoryName),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CategoryPage(
+                          parentId: item.parentCategoryId,
+                          categoryDao: categoryDao,
+                          productDao: productDao,
+                          parentCategoryDao: parentCategoryDao,
+                          productsRankingDao: productsRankingDao,
+                          rankingDao: rankingDao,
+                          variantDao: variantDao,
+                          categoryName: item.parentCategoryName,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          }
+        } else {
+          return const Center(
+            child: Text(
+              "Not Available",
+              style: TextStyle(fontSize: 30.0, color: Colors.grey),
             ),
-            onTap: () {},
-          ),
-        );
+          );
+        }
       },
     );
   }

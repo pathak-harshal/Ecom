@@ -9,6 +9,9 @@ abstract class ProductDao {
   @Query('SELECT * FROM product')
   Future<List<ProductEntity>> findAllProductList();
 
+  @Query('SELECT * FROM product WHERE category_id = :id')
+  Stream<List<ProductEntity>> findProductsWithCategory(int categoryId);
+
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertProducts(List<ProductEntity> products);
 }

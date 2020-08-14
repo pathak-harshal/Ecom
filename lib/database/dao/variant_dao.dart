@@ -10,6 +10,9 @@ abstract class VariantDao {
   @Query('SELECT * FROM variant')
   Future<List<VariantEntity>> findAllVariantList();
 
+  @Query('SELECT * FROM variant WHERE product_id = :id')
+  Stream<List<VariantEntity>> findVariantsProductWise(int productId);
+
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertVariants(List<VariantEntity> variants);
 }

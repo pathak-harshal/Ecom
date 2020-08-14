@@ -182,6 +182,16 @@ class _$CategoryDao extends CategoryDao {
   }
 
   @override
+  Stream<List<CategoryEntity>> findChildCategory(int parentId) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM category WHERE parent_id = ?',
+        arguments: <dynamic>[parentId],
+        queryableName: 'category',
+        isView: false,
+        mapper: _categoryMapper);
+  }
+
+  @override
   Future<void> insertCategories(List<CategoryEntity> categories) async {
     await _categoryEntityInsertionAdapter.insertList(
         categories, OnConflictStrategy.replace);
@@ -281,6 +291,16 @@ class _$ProductDao extends ProductDao {
   }
 
   @override
+  Stream<List<ProductEntity>> findProductsWithCategory(int categoryId) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM product WHERE category_id = ?',
+        arguments: <dynamic>[categoryId],
+        queryableName: 'product',
+        isView: false,
+        mapper: _productMapper);
+  }
+
+  @override
   Future<void> insertProducts(List<ProductEntity> products) async {
     await _productEntityInsertionAdapter.insertList(
         products, OnConflictStrategy.replace);
@@ -326,6 +346,16 @@ class _$VariantDao extends VariantDao {
   @override
   Future<List<VariantEntity>> findAllVariantList() async {
     return _queryAdapter.queryList('SELECT * FROM variant',
+        mapper: _variantMapper);
+  }
+
+  @override
+  Stream<List<VariantEntity>> findVariantsProductWise(int productId) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM variant WHERE product_id = ?',
+        arguments: <dynamic>[productId],
+        queryableName: 'variant',
+        isView: false,
         mapper: _variantMapper);
   }
 
