@@ -131,14 +131,14 @@ class Variant {
     factory Variant.fromJson(Map<String, dynamic> json) => Variant(
         id: json["id"],
         color: json["color"],
-        size: json["size"] == null ? null : json["size"],
+        size: json["size"] == null ? 0 : json["size"],
         price: json["price"],
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
         "color": color,
-        "size": size == null ? null : size,
+        "size": size == null ? 0 : size,
         "price": price,
     };
 }
@@ -185,9 +185,9 @@ class RankingProduct {
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "view_count": viewCount == null ? null : viewCount,
-        "order_count": orderCount == null ? null : orderCount,
-        "shares": shares == null ? null : shares,
+        "view_count": viewCount == null ? 0 : viewCount,
+        "order_count": orderCount == null ? 0 : orderCount,
+        "shares": shares == null ? 0 : shares,
     };
 }
 
